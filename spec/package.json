@@ -1,0 +1,15 @@
+{
+  "name": "call-calendar-contract",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build:openapi": "tsp compile typespec/main.tsp",
+    "check:openapi": "npm run build:openapi && git diff --exit-code -- tsp-output/@typespec/openapi3/openapi.yaml"
+  },
+  "devDependencies": {
+    "@typespec/compiler": "^0.65.3",
+    "@typespec/http": "^0.65.0",
+    "@typespec/openapi3": "^0.65.0",
+    "@typespec/rest": "^0.65.0"
+  }
+}

@@ -1,0 +1,335 @@
+openapi: 3.0.0
+info:
+  title: Call Calendar API
+  version: 0.0.0
+tags:
+  - name: Guest
+  - name: Owner
+paths:
+  /api/guest/bookings:
+    post:
+      operationId: GuestApi_createBooking
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/Booking'
+                  - $ref: '#/components/schemas/ValidationError'
+                  - $ref: '#/components/schemas/NotFoundError'
+                  - $ref: '#/components/schemas/OutOfWindowError'
+                  - $ref: '#/components/schemas/SlotConflictError'
+      tags:
+        - Guest
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBookingRequest'
+  /api/guest/event-types:
+    get:
+      operationId: GuestApi_listEventTypes
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventTypeListResponse'
+      tags:
+        - Guest
+  /api/guest/event-types/{eventTypeId}/slots:
+    get:
+      operationId: GuestApi_listAvailableSlots
+      parameters:
+        - name: eventTypeId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: windowDays
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/SlotListResponse'
+                  - $ref: '#/components/schemas/ValidationError'
+                  - $ref: '#/components/schemas/NotFoundError'
+      tags:
+        - Guest
+  /api/owner/bookings/upcoming:
+    get:
+      operationId: OwnerApi_listUpcomingBookings
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingListResponse'
+      tags:
+        - Owner
+  /api/owner/event-types:
+    post:
+      operationId: OwnerApi_createEventType
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/EventType'
+                  - $ref: '#/components/schemas/ValidationError'
+      tags:
+        - Owner
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEventTypeRequest'
+  /api/owner/profile:
+    get:
+      operationId: OwnerApi_getProfile
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OwnerProfile'
+      tags:
+        - Owner
+components:
+  schemas:
+    ApiError:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: string
+    Booking:
+      type: object
+      required:
+        - id
+        - eventTypeId
+        - eventTypeTitle
+        - startAt
+        - endAt
+        - guest
+        - createdAt
+      properties:
+        id:
+          type: string
+        eventTypeId:
+          type: string
+        eventTypeTitle:
+          type: string
+        startAt:
+          type: string
+          format: date-time
+        endAt:
+          type: string
+          format: date-time
+        guest:
+          $ref: '#/components/schemas/GuestContact'
+        createdAt:
+          type: string
+          format: date-time
+    BookingListResponse:
+      type: object
+      required:
+        - items
+        - total
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Booking'
+        total:
+          type: integer
+          format: int32
+    CreateBookingRequest:
+      type: object
+      required:
+        - eventTypeId
+        - startAt
+        - guest
+      properties:
+        eventTypeId:
+          type: string
+        startAt:
+          type: string
+          format: date-time
+        guest:
+          $ref: '#/components/schemas/GuestContact'
+    CreateEventTypeRequest:
+      type: object
+      required:
+        - title
+        - durationMinutes
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        durationMinutes:
+          type: integer
+          format: int32
+    EventType:
+      type: object
+      required:
+        - id
+        - title
+        - durationMinutes
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        durationMinutes:
+          type: integer
+          format: int32
+    EventTypeListResponse:
+      type: object
+      required:
+        - items
+        - total
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/EventType'
+        total:
+          type: integer
+          format: int32
+    GuestContact:
+      type: object
+      required:
+        - name
+        - email
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        note:
+          type: string
+    NotFoundError:
+      type: object
+      required:
+        - code
+      properties:
+        code:
+          type: string
+          enum:
+            - NOT_FOUND
+      allOf:
+        - $ref: '#/components/schemas/ApiError'
+    OutOfWindowError:
+      type: object
+      required:
+        - code
+      properties:
+        code:
+          type: string
+          enum:
+            - BOOKING_WINDOW_EXCEEDED
+      allOf:
+        - $ref: '#/components/schemas/ApiError'
+    OwnerProfile:
+      type: object
+      required:
+        - id
+        - displayName
+        - email
+      properties:
+        id:
+          type: string
+        displayName:
+          type: string
+        email:
+          type: string
+    Slot:
+      type: object
+      required:
+        - startAt
+        - endAt
+        - isAvailable
+      properties:
+        startAt:
+          type: string
+          format: date-time
+        endAt:
+          type: string
+          format: date-time
+        isAvailable:
+          type: boolean
+    SlotConflictError:
+      type: object
+      required:
+        - code
+      properties:
+        code:
+          type: string
+          enum:
+            - SLOT_ALREADY_BOOKED
+      allOf:
+        - $ref: '#/components/schemas/ApiError'
+    SlotListResponse:
+      type: object
+      required:
+        - eventTypeId
+        - windowDays
+        - items
+      properties:
+        eventTypeId:
+          type: string
+        windowDays:
+          type: integer
+          format: int32
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Slot'
+    ValidationError:
+      type: object
+      required:
+        - code
+      properties:
+        code:
+          type: string
+          enum:
+            - VALIDATION_ERROR
+      allOf:
+        - $ref: '#/components/schemas/ApiError'
+servers:
+  - url: http://localhost:3000
+    description: Local development
+    variables: {}
