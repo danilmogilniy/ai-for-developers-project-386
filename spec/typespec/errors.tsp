@@ -10,6 +10,10 @@ model ValidationError extends ApiError {
   code: "VALIDATION_ERROR";
 }
 
+/**
+ * Conflict means the requested interval overlaps with any owner busy interval
+ * (including existing bookings and owner-defined blocks), regardless of event type.
+ */
 model SlotConflictError extends ApiError {
   code: "SLOT_ALREADY_BOOKED";
 }

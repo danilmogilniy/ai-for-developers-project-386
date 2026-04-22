@@ -41,6 +41,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EventTypeListResponse'
+              examples:
+                eventTypesBase:
+                  summary: eventTypesBase
+                  description: Three base event types with fixed durations.
+                  value:
+                    items:
+                      - id: event-15
+                        title: Quick Sync
+                        description: Short 15-minute check-in.
+                        durationMinutes: 15
+                      - id: event-30
+                        title: Discovery Call
+                        description: Standard 30-minute conversation.
+                        durationMinutes: 30
+                      - id: event-60
+                        title: Deep Dive
+                        description: Extended 60-minute session.
+                        durationMinutes: 60
+                    total: 3
       tags:
         - Guest
   /api/guest/event-types/{eventTypeId}/slots:
@@ -52,6 +71,13 @@ paths:
           required: true
           schema:
             type: string
+        - name: date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+          explode: false
         - name: windowDays
           in: query
           required: false
@@ -82,9 +108,107 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BookingListResponse'
+              examples:
+                ownerUpcoming_2026_04_22_23:
+                  summary: ownerUpcoming_2026_04_22_23
+                  description: Upcoming bookings for Apr 22 and Apr 23.
+                  value:
+                    items:
+                      - id: booking-2026-04-22-1
+                        eventTypeId: event-30
+                        eventTypeTitle: Discovery Call
+                        startAt: '2026-04-22T09:00:00.000Z'
+                        endAt: '2026-04-22T09:30:00.000Z'
+                        guest:
+                          name: Alice Johnson
+                          email: alice@example.com
+                          note: Wants to discuss onboarding.
+                        createdAt: '2026-04-20T12:00:00.000Z'
+                      - id: booking-2026-04-22-2
+                        eventTypeId: event-60
+                        eventTypeTitle: Deep Dive
+                        startAt: '2026-04-22T14:00:00.000Z'
+                        endAt: '2026-04-22T15:00:00.000Z'
+                        guest:
+                          name: Bob Smith
+                          email: bob@example.com
+                          note: Product architecture review.
+                        createdAt: '2026-04-20T12:30:00.000Z'
+                      - id: booking-2026-04-23-1
+                        eventTypeId: event-15
+                        eventTypeTitle: Quick Sync
+                        startAt: '2026-04-23T08:30:00.000Z'
+                        endAt: '2026-04-23T08:45:00.000Z'
+                        guest:
+                          name: Carol Lee
+                          email: carol@example.com
+                          note: Follow-up on previous call.
+                        createdAt: '2026-04-21T10:00:00.000Z'
+                      - id: booking-2026-04-23-2
+                        eventTypeId: event-30
+                        eventTypeTitle: Discovery Call
+                        startAt: '2026-04-23T10:00:00.000Z'
+                        endAt: '2026-04-23T10:30:00.000Z'
+                        guest:
+                          name: David Green
+                          email: david@example.com
+                          note: Initial requirements discussion.
+                        createdAt: '2026-04-21T10:15:00.000Z'
+                      - id: booking-2026-04-23-3
+                        eventTypeId: event-30
+                        eventTypeTitle: Discovery Call
+                        startAt: '2026-04-23T13:00:00.000Z'
+                        endAt: '2026-04-23T13:30:00.000Z'
+                        guest:
+                          name: Emma Wilson
+                          email: emma@example.com
+                          note: Review integration details.
+                        createdAt: '2026-04-21T11:00:00.000Z'
+                      - id: booking-2026-04-23-4
+                        eventTypeId: event-60
+                        eventTypeTitle: Deep Dive
+                        startAt: '2026-04-23T16:00:00.000Z'
+                        endAt: '2026-04-23T17:00:00.000Z'
+                        guest:
+                          name: Frank Brown
+                          email: frank@example.com
+                          note: Technical roadmap planning.
+                        createdAt: '2026-04-21T11:30:00.000Z'
+                    total: 6
       tags:
         - Owner
   /api/owner/event-types:
+    get:
+      operationId: OwnerApi_listEventTypes
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventTypeListResponse'
+              examples:
+                ownerEventTypes:
+                  summary: ownerEventTypes
+                  description: All owner-managed event types.
+                  value:
+                    items:
+                      - id: event-15
+                        title: Quick Sync
+                        description: Short 15-minute check-in.
+                        durationMinutes: 15
+                      - id: event-30
+                        title: Discovery Call
+                        description: Standard 30-minute conversation.
+                        durationMinutes: 30
+                      - id: event-60
+                        title: Deep Dive
+                        description: Extended 60-minute session.
+                        durationMinutes: 60
+                    total: 3
+      tags:
+        - Owner
     post:
       operationId: OwnerApi_createEventType
       parameters: []
@@ -105,6 +229,52 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateEventTypeRequest'
+  /api/owner/event-types/{eventTypeId}:
+    patch:
+      operationId: OwnerApi_updateEventType
+      parameters:
+        - name: eventTypeId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/EventType'
+                  - $ref: '#/components/schemas/ValidationError'
+                  - $ref: '#/components/schemas/NotFoundError'
+      tags:
+        - Owner
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEventTypeRequest'
+    delete:
+      operationId: OwnerApi_deleteEventType
+      parameters:
+        - name: eventTypeId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/DeleteEventTypeResponse'
+                  - $ref: '#/components/schemas/NotFoundError'
+      tags:
+        - Owner
   /api/owner/profile:
     get:
       operationId: OwnerApi_getProfile
@@ -200,6 +370,13 @@ components:
         durationMinutes:
           type: integer
           format: int32
+    DeleteEventTypeResponse:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
     EventType:
       type: object
       required:
@@ -291,6 +468,11 @@ components:
           format: date-time
         isAvailable:
           type: boolean
+        busyReason:
+          type: string
+          enum:
+            - BOOKING
+            - OWNER_BLOCK
     SlotConflictError:
       type: object
       required:
@@ -302,11 +484,19 @@ components:
             - SLOT_ALREADY_BOOKED
       allOf:
         - $ref: '#/components/schemas/ApiError'
+      description: |-
+        Conflict means the requested interval overlaps with any owner busy interval
+        (including existing bookings and owner-defined blocks), regardless of event type.
     SlotListResponse:
       type: object
       required:
         - eventTypeId
         - windowDays
+        - date
+        - timezone
+        - workdayStart
+        - workdayEnd
+        - slotDurationMinutes
         - items
       properties:
         eventTypeId:
@@ -314,10 +504,55 @@ components:
         windowDays:
           type: integer
           format: int32
+        date:
+          type: string
+          format: date
+        timezone:
+          type: string
+        workdayStart:
+          type: string
+        workdayEnd:
+          type: string
+        slotDurationMinutes:
+          type: integer
+          format: int32
         items:
           type: array
           items:
             $ref: '#/components/schemas/Slot'
+      example:
+        eventTypeId: event-15
+        windowDays: 14
+        date: '2026-04-23'
+        timezone: Europe/Moscow
+        workdayStart: '09:00'
+        workdayEnd: '18:00'
+        slotDurationMinutes: 15
+        items:
+          - startAt: '2026-04-23T06:00:00Z'
+            endAt: '2026-04-23T06:15:00Z'
+            isAvailable: true
+          - startAt: '2026-04-23T06:15:00Z'
+            endAt: '2026-04-23T06:30:00Z'
+            isAvailable: false
+            busyReason: BOOKING
+          - startAt: '2026-04-23T06:30:00Z'
+            endAt: '2026-04-23T06:45:00Z'
+            isAvailable: true
+          - startAt: '2026-04-23T06:45:00Z'
+            endAt: '2026-04-23T07:00:00Z'
+            isAvailable: false
+            busyReason: OWNER_BLOCK
+    UpdateEventTypeRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        durationMinutes:
+          type: integer
+          format: int32
     ValidationError:
       type: object
       required:

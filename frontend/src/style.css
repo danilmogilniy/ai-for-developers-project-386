@@ -1,0 +1,210 @@
+:root {
+  --app-bg: #edf2ff;
+  --app-bg-soft: #f8faff;
+  --app-surface: #ffffff;
+  --app-surface-border: #d9e2f2;
+  --app-text-primary: #111827;
+  --app-text-secondary: #4b5563;
+  --app-accent: #0ea5a6;
+  --app-accent-dark: #0f766e;
+  --app-shadow: 0 16px 32px rgba(15, 23, 42, 0.08);
+  --app-shadow-strong: 0 22px 50px rgba(3, 7, 18, 0.3);
+  --app-radius-lg: 1rem;
+  --app-radius-xl: 1.5rem;
+  --app-shell: 1120px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  background: radial-gradient(circle at 90% -20%, #d5faf6, transparent 45%), var(--app-bg);
+  color: var(--app-text-primary);
+}
+
+#app,
+.app-root {
+  min-height: 100vh;
+}
+
+.app-shell {
+  width: min(var(--app-shell), calc(100% - 2rem));
+  margin: 0 auto;
+}
+
+.app-page {
+  padding: 6.25rem 0 2.5rem;
+}
+
+.app-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.app-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.app-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.app-field-full {
+  grid-column: 1 / -1;
+}
+
+.landing-page {
+  position: relative;
+  overflow: hidden;
+  min-height: 100vh;
+  padding: 2rem 0 3rem;
+  background:
+    radial-gradient(circle at 20% 10%, rgba(16, 185, 129, 0.3), transparent 35%),
+    radial-gradient(circle at 90% 90%, rgba(20, 184, 166, 0.35), transparent 40%),
+    linear-gradient(135deg, #032827 0%, #043f3e 48%, #05614f 100%);
+  color: #f8fafc;
+}
+
+.landing-page::before {
+  content: '';
+  position: absolute;
+  inset: auto -10rem -12rem auto;
+  width: 24rem;
+  height: 24rem;
+  border-radius: 999px;
+  background: rgba(16, 185, 129, 0.2);
+  filter: blur(20px);
+}
+
+.landing-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2.5rem;
+}
+
+.landing-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 700;
+}
+
+.landing-brand__dot {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 999px;
+  background: #34d399;
+  box-shadow: 0 0 0 5px rgba(52, 211, 153, 0.18);
+}
+
+.surface-card {
+  border: 1px solid var(--app-surface-border);
+  border-radius: var(--app-radius-xl);
+  background: color-mix(in srgb, var(--app-surface) 96%, #f8fafc);
+  box-shadow: var(--app-shadow);
+}
+
+.p-card {
+  border-radius: var(--app-radius-lg);
+  border: 1px solid var(--app-surface-border);
+  box-shadow: var(--app-shadow);
+}
+
+.p-card .p-card-content {
+  color: var(--app-text-secondary);
+}
+
+.p-button {
+  border-radius: 0.8rem;
+}
+
+.app-page .p-card {
+  background: #ffffff;
+  border-color: #d7e1f1;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+}
+
+.app-page .p-card .p-card-title {
+  color: #111827;
+}
+
+.app-page .p-card .p-card-content,
+.app-page .p-datatable,
+.app-page .p-datatable .p-datatable-thead > tr > th,
+.app-page .p-datatable .p-datatable-tbody > tr > td {
+  color: #374151;
+}
+
+.app-page .p-datatable .p-datatable-thead > tr > th {
+  background: #edf7f7;
+  color: #24575b;
+  font-weight: 600;
+}
+
+.app-page .p-datatable .p-datatable-tbody > tr {
+  background: #ffffff;
+}
+
+.app-page .p-datatable .p-datatable-tbody > tr > td {
+  border-color: #e5eaf4;
+}
+
+.app-page .p-datatable .p-datatable-tbody > tr.p-row-selected {
+  background: #f3fbfa;
+}
+
+.app-page .p-inputtext,
+.app-page .p-inputnumber-input,
+.app-page .p-textarea {
+  background: #ffffff;
+  color: #1f2937;
+  border: 1px solid #cfd8e6;
+}
+
+.app-page .p-inputtext:hover,
+.app-page .p-inputnumber-input:hover,
+.app-page .p-textarea:hover {
+  border-color: #b8c5d8;
+}
+
+.app-page .p-inputtext:enabled:focus,
+.app-page .p-inputnumber-input:enabled:focus,
+.app-page .p-textarea:enabled:focus {
+  border-color: #86d9e1;
+  box-shadow: 0 0 0 3px rgba(72, 171, 186, 0.14);
+}
+
+.app-page .p-inputtext:disabled,
+.app-page .p-inputnumber-input:disabled,
+.app-page .p-textarea:disabled {
+  background: #f8fafc;
+  color: #94a3b8;
+}
+
+@media (max-width: 960px) {
+  .app-page {
+    padding-top: 5.5rem;
+  }
+
+  .app-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .landing-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+}

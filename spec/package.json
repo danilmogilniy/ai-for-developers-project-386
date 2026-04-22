@@ -4,9 +4,12 @@
   "private": true,
   "scripts": {
     "build:openapi": "tsp compile typespec/main.tsp",
-    "check:openapi": "npm run build:openapi && git diff --exit-code -- tsp-output/@typespec/openapi3/openapi.yaml"
+    "check:openapi": "npm run build:openapi && git diff --exit-code -- tsp-output/@typespec/openapi3/openapi.yaml",
+    "prism:mock": "prism mock tsp-output/@typespec/openapi3/openapi.yaml -p 4010",
+    "prism:proxy": "prism proxy tsp-output/@typespec/openapi3/openapi.yaml http://localhost:3000 -p 4010"
   },
   "devDependencies": {
+    "@stoplight/prism-cli": "^5.14.2",
     "@typespec/compiler": "^0.65.3",
     "@typespec/http": "^0.65.0",
     "@typespec/openapi3": "^0.65.0",
