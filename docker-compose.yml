@@ -1,0 +1,14 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      HOST: 0.0.0.0
+      TIMEZONE: UTC
+      WORKDAY_START: "09:00"
+      WORKDAY_END: "18:00"
+      BOOKING_WINDOW_DAYS: 14

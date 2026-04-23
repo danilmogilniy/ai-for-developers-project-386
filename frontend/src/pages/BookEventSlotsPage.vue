@@ -14,9 +14,10 @@ import ruLocale from '@fullcalendar/core/locales/ru'
 import type { DateClickArg } from '@fullcalendar/interaction'
 import type { CalendarOptions, EventInput } from '@fullcalendar/core'
 import { useToast } from 'primevue/usetoast'
-import { createBooking, listAvailableSlots } from '../shared/api/guestApi'
+import { createBooking, listAvailableSlots, listEventTypes } from '../shared/api/guestApi'
 import { isApiError, isNotFoundError, isOutOfWindowError, isSlotConflictError, isValidationError } from '../shared/api/guards'
-import type { Slot } from '../shared/api/types'
+import { APP_CALENDAR_TIME_ZONE, APP_TIME_ZONE, fromMoscowDateKey, getMoscowDateKey } from '../shared/time/moscowTime'
+import type { EventType, Slot } from '../shared/api/types'
 
 const route = useRoute()
 const router = useRouter()
@@ -28,8 +29,9 @@ const slotsLoading = ref(false)
 const submitting = ref(false)
 const error = ref<string | null>(null)
 const slots = ref<Slot[]>([])
+const eventTypes = ref<EventType[]>([])
 const selectedSlot = ref<Slot | null>(null)
-const selectedDate = ref(new Date().toISOString().slice(0, 10))
+const selectedDate = ref(getMoscowDateKey())
 const slotMeta = ref<{
   timezone: string
   workdayStart: string
@@ -51,6 +53,9 @@ const isFormValid = computed(
 )
 
 const availableSlots = computed(() => slots.value.filter((slot) => slot.isAvailable))
+const selectedEventType = computed<EventType | null>(
+  () => eventTypes.value.find((eventType) => eventType.id === eventTypeId.value) ?? null,
+)
 
 const selectedDateEvents = computed<EventInput[]>(() => [
   {
@@ -62,8 +67,7 @@ const selectedDateEvents = computed<EventInput[]>(() => [
   },
 ])
 
-const todayDate = new Date().toISOString().slice(0, 10)
-const todayStart = new Date(`${todayDate}T00:00:00`)
+const todayDate = getMoscowDateKey()
 
 const calendarOptions = computed<CalendarOptions>(() => ({
   plugins: [dayGridPlugin, interactionPlugin],
@@ -80,11 +84,9 @@ const calendarOptions = computed<CalendarOptions>(() => ({
   },
   height: 'auto',
   fixedWeekCount: false,
+  timeZone: APP_CALENDAR_TIME_ZONE,
   selectable: true,
-  dayCellClassNames: (arg) => {
-    const cellDate = new Date(`${arg.dateStr}T00:00:00`)
-    return cellDate < todayStart ? ['fc-day-disabled-past'] : []
-  },
+  dayCellClassNames: (arg) => (arg.dateStr < todayDate ? ['fc-day-disabled-past'] : []),
   events: selectedDateEvents.value,
   dateClick: (arg: DateClickArg): void => {
     if (arg.dateStr < todayDate) {
@@ -94,22 +96,24 @@ const calendarOptions = computed<CalendarOptions>(() => ({
   },
 }))
 
-const selectedSlotLabel = computed(() =>
-  selectedSlot.value ? `${formatTime(selectedSlot.value.startAt)} - ${formatTime(selectedSlot.value.endAt)}` : null,
-)
-
 const selectedDateLabel = computed(() =>
-  new Date(`${selectedDate.value}T00:00:00`).toLocaleDateString('ru-RU', {
+  new Date(fromMoscowDateKey(selectedDate.value)).toLocaleDateString('ru-RU', {
     day: '2-digit',
     month: 'long',
     year: 'numeric',
+    timeZone: APP_TIME_ZONE,
   }),
 )
 
+const wait = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms))
+
 function formatTime(value: string): string {
+  const timezone = slotMeta.value?.timezone ?? APP_TIME_ZONE
   return new Date(value).toLocaleTimeString('ru-RU', {
     hour: '2-digit',
     minute: '2-digit',
+    hour12: false,
+    timeZone: timezone,
   })
 }
 
@@ -162,7 +166,17 @@ function showApiError(message: string): void {
   toast.add({ severity: 'error', summary: 'Ошибка', detail: message, life: 4000 })
 }
 
+const loadEventTypes = async (): Promise<void> => {
+  try {
+    const result = await listEventTypes()
+    eventTypes.value = result.items
+  } catch {
+    eventTypes.value = []
+  }
+}
+
 onMounted(async () => {
+  await loadEventTypes()
   await loadSlotsForDate('initial')
 })
 
@@ -193,6 +207,7 @@ const submit = async (): Promise<void> => {
 
     if (!isApiError(result)) {
       toast.add({ severity: 'success', summary: 'Готово', detail: 'Бронирование создано', life: 3500 })
+      await wait(900)
       void router.push('/book')
       return
     }
@@ -225,7 +240,8 @@ const submit = async (): Promise<void> => {
       <Card>
         <template #title>Выбор слота и бронирование</template>
         <template #content>
-          <p>Тип события: {{ eventTypeId }}</p>
+          <p>Название события: {{ selectedEventType?.title ?? eventTypeId }}</p>
+          <p v-if="selectedEventType?.description">{{ selectedEventType.description }}</p>
         </template>
       </Card>
 
@@ -273,9 +289,6 @@ const submit = async (): Promise<void> => {
               </Message>
               <Message v-else-if="availableSlots.length === 0" severity="warn" :closable="false">
                 На выбранную дату нет свободных слотов.
-              </Message>
-              <Message v-if="selectedSlotLabel" class="selected-slot-message" severity="success" :closable="false">
-                Выбран слот: {{ selectedSlotLabel }}
               </Message>
             </div>
           </div>
@@ -406,24 +419,14 @@ const submit = async (): Promise<void> => {
   color: #166534;
 }
 
+.slots-list :deep(.slot-item.slot-item-selected.p-button.p-button-secondary:enabled:hover) {
+  background: #dcfce7;
+  border-color: #86efac;
+  color: #166534;
+}
+
 .slots-list :deep(.slot-item.slot-item-selected.p-button.p-button-secondary .p-button-label) {
   color: #166534;
-  font-weight: 600;
-}
-
-.selected-slot-message {
-  margin-top: 0.75rem;
-}
-
-.selected-slot-message :deep(.p-message) {
-  background: #dcfce7;
-  border: 1px solid #86efac;
-}
-
-.selected-slot-message :deep(.p-message .p-message-text),
-.selected-slot-message :deep(.p-message .p-message-content) {
-  color: #166534;
-  font-weight: 600;
 }
 
 .calendar-pane :deep(.fc .fc-button-primary) {

@@ -215,24 +215,24 @@ export interface components {
          *       "slotDurationMinutes": 15,
          *       "items": [
          *         {
-         *           "startAt": "2026-04-23T06:00:00Z",
-         *           "endAt": "2026-04-23T06:15:00Z",
+         *           "startAt": "2026-04-23T09:00:00+03:00",
+         *           "endAt": "2026-04-23T09:15:00+03:00",
          *           "isAvailable": true
          *         },
          *         {
-         *           "startAt": "2026-04-23T06:15:00Z",
-         *           "endAt": "2026-04-23T06:30:00Z",
+         *           "startAt": "2026-04-23T09:15:00+03:00",
+         *           "endAt": "2026-04-23T09:30:00+03:00",
          *           "isAvailable": false,
          *           "busyReason": "BOOKING"
          *         },
          *         {
-         *           "startAt": "2026-04-23T06:30:00Z",
-         *           "endAt": "2026-04-23T06:45:00Z",
+         *           "startAt": "2026-04-23T09:30:00+03:00",
+         *           "endAt": "2026-04-23T09:45:00+03:00",
          *           "isAvailable": true
          *         },
          *         {
-         *           "startAt": "2026-04-23T06:45:00Z",
-         *           "endAt": "2026-04-23T07:00:00Z",
+         *           "startAt": "2026-04-23T09:45:00+03:00",
+         *           "endAt": "2026-04-23T10:00:00+03:00",
          *           "isAvailable": false,
          *           "busyReason": "OWNER_BLOCK"
          *         }

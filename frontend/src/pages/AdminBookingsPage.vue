@@ -18,6 +18,7 @@ import {
   mapBookingsToCalendarEvents,
   type BookingEventMeta,
 } from '../shared/calendar/bookingCalendar'
+import { APP_CALENDAR_TIME_ZONE, APP_TIME_ZONE } from '../shared/time/moscowTime'
 
 const router = useRouter()
 const loading = ref(true)
@@ -45,6 +46,7 @@ const calendarOptions = computed<CalendarOptions>(() => ({
     day: 'День',
     list: 'Список',
   },
+  timeZone: APP_CALENDAR_TIME_ZONE,
   events: calendarEvents.value,
   height: 'auto',
   dayMaxEvents: 3,
@@ -66,6 +68,7 @@ const formatDateTime = (value: string): string =>
     year: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
+    timeZone: APP_TIME_ZONE,
   })
 
 const openEventTypesPage = (): void => {

@@ -24,12 +24,14 @@ export const requestJson = async <TResponse>(
   path: string,
   init?: RequestInit,
 ): Promise<TResponse> => {
+  const baseHeaders = new Headers(init?.headers)
+  if (init?.body !== undefined && !baseHeaders.has('Content-Type')) {
+    baseHeaders.set('Content-Type', 'application/json')
+  }
+
   const response = await fetch(`${env.apiBaseUrl}${path}`, {
     ...init,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(init?.headers ?? {}),
-    },
+    headers: baseHeaders,
   })
 
   if (!response.ok) {
