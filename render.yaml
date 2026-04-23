@@ -12,7 +12,7 @@ services:
       - key: HOST
         value: 0.0.0.0
 
-  - type: static_site
+  - type: static
     name: call-calendar-frontend
     rootDir: frontend
     buildCommand: npm ci && npm run build
