@@ -14,12 +14,8 @@ services:
 
   - type: web
     name: call-calendar-frontend
-    runtime: static
-    rootDir: frontend
-    buildCommand: npm ci && npm run build
-    staticPublishPath: dist
+    runtime: docker
+    dockerfilePath: ./frontend/Dockerfile
     envVars:
-      - key: NODE_VERSION
-        value: 22
       - key: VITE_API_BASE_URL
         sync: false

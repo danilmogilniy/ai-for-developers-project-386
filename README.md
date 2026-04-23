@@ -90,20 +90,58 @@ npm run dev:backend
 
 ## Deploy on Render
 
-This repository is configured for two Render services via `render.yaml`:
+This repository is configured for two Render `Web Service` services:
 
 - `call-calendar-backend` (`Web Service`) for API.
-- `call-calendar-frontend` (`Static Site`) for UI.
+- `call-calendar-frontend` (`Web Service`, Docker + Nginx) for UI.
 
-### Deploy with Blueprint
+### Deploy manually (without Blueprint)
 
-1. In Render dashboard, create a new Blueprint service from this repository.
-2. Render will create both services from `render.yaml`.
-3. After first deploy, open frontend service settings and set:
-   - `VITE_API_BASE_URL=https://<your-backend-service>.onrender.com`
-4. Trigger frontend redeploy after updating `VITE_API_BASE_URL`.
+1. In Render dashboard, create a new `Web Service` for backend:
+   - **Runtime**: `Node`
+   - **Root Directory**: `backend`
+   - **Build Command**: `npm ci && npm run build`
+   - **Start Command**: `npm run start`
+   - **Health Check Path**: `/health`
+   - **Environment Variables**:
+     - `NODE_VERSION=22`
+     - `HOST=0.0.0.0`
+2. Wait for backend deploy and copy backend URL:
+   - `https://<your-backend-service>.onrender.com`
+3. Create a second `Web Service` for frontend:
+   - **Runtime**: `Docker`
+   - **Dockerfile Path**: `frontend/Dockerfile`
+   - **Context**: repository root
+   - **Environment Variables**:
+     - `VITE_API_BASE_URL=https://<your-backend-service>.onrender.com`
+4. Trigger frontend deploy after setting `VITE_API_BASE_URL`.
 
 ### Expected result
 
 - Frontend URL opens UI on `/`.
 - Backend URL returns API info on `/` and health status on `/health`.
+
+## Local run with Docker
+
+The repository includes a `docker-compose.yml` with two services:
+
+- `backend` on `http://localhost:3000`
+- `frontend` on `http://localhost:8080`
+
+### Start
+
+```bash
+docker compose up --build
+```
+
+### Start in background
+
+```bash
+docker compose up --build -d
+```
+
+### Stop and remove containers
+
+```bash
+docker compose down
+```
