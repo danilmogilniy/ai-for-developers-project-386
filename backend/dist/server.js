@@ -15,6 +15,10 @@ export const buildServer = () => {
         methods: ["GET", "HEAD", "POST", "PATCH", "DELETE", "OPTIONS"],
         allowedHeaders: ["Content-Type", "Authorization"],
     });
+    app.get("/", async () => ({
+        service: "booking-api",
+        health: "/health",
+    }));
     app.get("/health", async () => ({ ok: true }));
     app.register(async (instance) => {
         await registerGuestRoutes(instance, bookingService);

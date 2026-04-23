@@ -87,3 +87,23 @@ Set backend URL in `frontend/.env.backend` (default `http://localhost:3000`) and
 cd frontend
 npm run dev:backend
 ```
+
+## Deploy on Render
+
+This repository is configured for two Render services via `render.yaml`:
+
+- `call-calendar-backend` (`Web Service`) for API.
+- `call-calendar-frontend` (`Static Site`) for UI.
+
+### Deploy with Blueprint
+
+1. In Render dashboard, create a new Blueprint service from this repository.
+2. Render will create both services from `render.yaml`.
+3. After first deploy, open frontend service settings and set:
+   - `VITE_API_BASE_URL=https://<your-backend-service>.onrender.com`
+4. Trigger frontend redeploy after updating `VITE_API_BASE_URL`.
+
+### Expected result
+
+- Frontend URL opens UI on `/`.
+- Backend URL returns API info on `/` and health status on `/health`.
