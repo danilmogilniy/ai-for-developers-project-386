@@ -252,12 +252,12 @@ const submit = async (): Promise<void> => {
         <template #title>Доступные слоты</template>
         <template #content>
           <div class="slots-layout">
-            <div class="calendar-pane">
+            <div class="calendar-pane" data-testid="booking-calendar">
               <FullCalendar :options="calendarOptions" />
             </div>
 
-            <div class="slots-pane">
-              <div class="slots-meta">
+            <div class="slots-pane" data-testid="slots-pane">
+              <div class="slots-meta" data-testid="slots-meta">
                 <p><strong>Дата:</strong> {{ selectedDateLabel }}</p>
                 <p v-if="slotMeta">
                   <strong>Окно:</strong> {{ slotMeta.workdayStart }} - {{ slotMeta.workdayEnd }},
@@ -270,11 +270,12 @@ const submit = async (): Promise<void> => {
                 Обновляем слоты для выбранной даты...
               </Message>
 
-              <div class="slots-list">
+              <div class="slots-list" data-testid="slots-list">
                 <Button
                   v-for="slot in slots"
                   :key="slot.startAt"
                   class="slot-item"
+                  :data-testid="`slot-option-${slot.startAt}`"
                   :class="{ 'slot-item-selected': selectedSlot?.startAt === slot.startAt }"
                   :label="`${formatTime(slot.startAt)} - ${formatTime(slot.endAt)}`"
                   :outlined="selectedSlot?.startAt !== slot.startAt"
@@ -301,21 +302,24 @@ const submit = async (): Promise<void> => {
           <div class="app-form-grid">
             <label class="app-field">
               <span>Имя</span>
-              <InputText v-model="guestName" />
+              <InputText v-model="guestName" data-testid="guest-name-input" />
             </label>
             <label class="app-field">
               <span>Email</span>
-              <InputText v-model="guestEmail" type="email" autocomplete="email" />
-              <small v-if="showGuestEmailError" class="field-error">Введите корректный email.</small>
+              <InputText v-model="guestEmail" type="email" autocomplete="email" data-testid="guest-email-input" />
+              <small v-if="showGuestEmailError" class="field-error" data-testid="guest-email-error">
+                Введите корректный email.
+              </small>
             </label>
             <label class="app-field app-field-full">
               <span>Заметка</span>
-              <Textarea v-model="guestNote" rows="4" />
+              <Textarea v-model="guestNote" rows="4" data-testid="guest-note-input" />
             </label>
           </div>
           <Button
             label="Подтвердить бронирование"
             class="submit"
+            data-testid="submit-booking-button"
             :disabled="!isFormValid || initialLoading || slotsLoading"
             :loading="submitting"
             @click="submit"

@@ -48,15 +48,20 @@ onMounted(async () => {
         <Skeleton v-for="index in 2" :key="index" height="7rem" />
       </div>
 
-      <div v-else-if="hasItems" class="cards">
-        <Card v-for="item in eventTypes" :key="item.id">
+      <div v-else-if="hasItems" class="cards" data-testid="event-types-list">
+        <Card v-for="item in eventTypes" :key="item.id" :data-testid="`event-type-card-${item.id}`">
           <template #title>{{ item.title }}</template>
           <template #content>
             <div class="row">
               <span>{{ item.description || 'Описание не указано' }}</span>
               <Tag icon="pi pi-clock" :value="`${item.durationMinutes} мин`" />
             </div>
-            <Button label="Выбрать" class="pick" @click="openEventType(item.id)" />
+            <Button
+              label="Выбрать"
+              class="pick"
+              :data-testid="`select-event-type-${item.id}`"
+              @click="openEventType(item.id)"
+            />
           </template>
         </Card>
       </div>

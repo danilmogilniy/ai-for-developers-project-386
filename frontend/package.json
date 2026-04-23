@@ -8,7 +8,9 @@
     "dev:backend": "vite --mode backend",
     "build": "vue-tsc -b && vite build",
     "preview": "vite preview",
-    "generate:api-types": "openapi-typescript ../spec/tsp-output/@typespec/openapi3/openapi.yaml -o src/shared/api/openapi.ts"
+    "generate:api-types": "openapi-typescript ../spec/tsp-output/@typespec/openapi3/openapi.yaml -o src/shared/api/openapi.ts",
+    "test:e2e": "playwright test",
+    "test:e2e:ci": "playwright test --reporter=github,line"
   },
   "dependencies": {
     "@fullcalendar/core": "^6.1.20",
@@ -24,6 +26,7 @@
     "vue-router": "^4.6.4"
   },
   "devDependencies": {
+    "@playwright/test": "^1.59.1",
     "@types/node": "^24.12.2",
     "@vitejs/plugin-vue": "^6.0.6",
     "@vue/tsconfig": "^0.9.1",

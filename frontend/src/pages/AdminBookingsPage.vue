@@ -105,7 +105,9 @@ onMounted(async () => {
       <Card v-else class="calendar-card">
         <template #title>Предстоящие записи</template>
         <template #content>
-          <FullCalendar :options="calendarOptions" />
+          <div data-testid="admin-bookings-calendar">
+            <FullCalendar :options="calendarOptions" />
+          </div>
         </template>
       </Card>
 
@@ -116,12 +118,12 @@ onMounted(async () => {
         :style="{ width: 'min(40rem, 95vw)' }"
         @hide="closeDetailsDialog"
       >
-        <div v-if="selectedEvent" class="details-grid">
-          <p><strong>Тип события:</strong> {{ selectedEvent.eventTypeTitle }}</p>
+        <div v-if="selectedEvent" class="details-grid" data-testid="booking-details-dialog">
+          <p data-testid="booking-details-event-type"><strong>Тип события:</strong> {{ selectedEvent.eventTypeTitle }}</p>
           <p><strong>Начало:</strong> {{ formatDateTime(selectedEvent.startAt) }}</p>
           <p><strong>Окончание:</strong> {{ formatDateTime(selectedEvent.endAt) }}</p>
-          <p><strong>Гость:</strong> {{ selectedEvent.guestName }}</p>
-          <p><strong>Email:</strong> {{ selectedEvent.guestEmail }}</p>
+          <p data-testid="booking-details-guest-name"><strong>Гость:</strong> {{ selectedEvent.guestName }}</p>
+          <p data-testid="booking-details-guest-email"><strong>Email:</strong> {{ selectedEvent.guestEmail }}</p>
           <p v-if="selectedEvent.guestNote"><strong>Заметка:</strong> {{ selectedEvent.guestNote }}</p>
           <p><strong>Создано:</strong> {{ formatDateTime(selectedEvent.createdAt) }}</p>
         </div>
